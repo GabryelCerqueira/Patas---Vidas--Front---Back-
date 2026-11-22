@@ -26,12 +26,12 @@ O arquivo [`.github/workflows/docker-image.yml`](.github/workflows/docker-image.
 3. **Validar o build do Docker Compose** (Frontend Nginx + Backend Gunicorn).
 4. **Publicar a imagem pronta** no **GitHub Container Registry (GHCR)**:
    ```bash
-   ghcr.io/gabryelcerqueira/patas---vidas--front---back-:latest
+   ghcr.io/gabryelcerqueira/patas-e-vidas:latest
    ```
 
 ### 🚀 Rodar a Imagem Pronta em Qualquer Servidor (sem precisar compilar):
 ```bash
-docker run -d --name patas-vidas -p 8000:8000 ghcr.io/gabryelcerqueira/patas---vidas--front---back-:latest
+docker run -d --name patas-vidas -p 8000:8000 ghcr.io/gabryelcerqueira/patas-e-vidas:latest
 ```
 Acesse imediatamente em `http://localhost:8000` ou no IP/domínio do seu servidor!
 
