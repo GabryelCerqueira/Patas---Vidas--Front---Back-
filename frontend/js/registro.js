@@ -30,7 +30,7 @@
       if (resp.ok) {
         elStatus.innerHTML = `
           <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#28a745; margin-right:6px;"></span>
-          <strong style="color:#005645;">Flask Online</strong> (SQLite conectado na tabela <code>animais</code> em <code>${API_BASE}</code>)
+          <strong style="color:#005645;">Online</strong>
         `;
         elStatus.style.background = '#e8f5e9';
         elStatus.style.borderColor = '#c8e6c9';
@@ -40,7 +40,7 @@
     } catch (err) {
       elStatus.innerHTML = `
         <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#dc3545; margin-right:6px;"></span>
-        <strong style="color:#c62828;">Servidor Flask Offline</strong> — Inicie o back-end executando o arquivo <code>iniciar_sistema.bat</code> ou <code>python backend/server.py</code>
+        <strong style="color:#c62828;">Offline</strong>
       `;
       elStatus.style.background = '#ffebee';
       elStatus.style.borderColor = '#ffcdd2';
@@ -71,7 +71,7 @@
         <tr class="linha-vazia">
           <td colspan="9" style="text-align: center; padding: 30px 15px; color: #c62828; background: #fff8f8;">
             <p style="font-weight: 700; font-size: 15px; margin-bottom: 6px;">
-              Não foi possível conectar ao servidor Flask.
+              Não foi possível conectar ao servidor.
             </p>
             <p style="color: #555; font-size: 13px; margin-bottom: 12px;">
               Certifique-se de executar no terminal ou rodar o arquivo <code>iniciar_sistema.bat</code>:
