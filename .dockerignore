@@ -1,0 +1,11 @@
+.git
+.gitignore
+.gemini
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+*.bat
+.vscode
+.idea
+*.log
