@@ -8,12 +8,32 @@ Este guia contém instruções passo a passo para fazer o deploy do sistema **Pa
 
 | Arquivo | Finalidade | Onde Usar |
 | :--- | :--- | :--- |
-| `Dockerfile` (raiz) | Container universal fullstack (Backend Flask + Frontend estático) | Deploy simples em **Render**, **Railway**, **Fly.io**, **Cloud Run** |
+| `.github/workflows/docker-image.yml` | Pipeline de CI/CD automática do GitHub Actions | Compila, testa o healthcheck e publica a imagem no **GitHub Container Registry (GHCR)** a cada push |
+| `Dockerfile` (raiz) | Container universal fullstack (Backend Flask + Frontend estático) | Deploy simples em **Render**, **Railway**, **Fly.io**, **Cloud Run** ou via **GHCR** |
 | `docker-compose.yml` | Orquestração de 2 serviços separados (Nginx no front + Gunicorn no back) com persistência SQLite | Deploy em **VPS**, **Servidores Dedicados** ou **Ambiente Local** |
 | `backend/Dockerfile` | Container exclusivo do Backend Python Flask / Gunicorn | Usado pelo `docker-compose.yml` |
 | `frontend/Dockerfile` | Container do Frontend Nginx com proxy reverso e compressão | Usado pelo `docker-compose.yml` |
 | `frontend/nginx.conf` | Configuração de proxy reverso e otimizações de cache | Integrado ao Nginx |
 | `.dockerignore` | Evita envio de arquivos desnecessários ao build | Otimização de tempo e tamanho da imagem |
+
+---
+
+## 🤖 Integração Contínua (CI/CD) com GitHub Actions
+
+O arquivo [`.github/workflows/docker-image.yml`](.github/workflows/docker-image.yml) já está configurado para:
+1. **Compilar e testar** a imagem Docker automaticamente a cada `git push` na branch `main`.
+2. **Executar teste de Healthcheck**, garantindo que o servidor Flask e a API (`/api`) sobem sem falhas.
+3. **Validar o build do Docker Compose** (Frontend Nginx + Backend Gunicorn).
+4. **Publicar a imagem pronta** no **GitHub Container Registry (GHCR)**:
+   ```bash
+   ghcr.io/gabryelcerqueira/patas---vidas--front---back-:latest
+   ```
+
+### 🚀 Rodar a Imagem Pronta em Qualquer Servidor (sem precisar compilar):
+```bash
+docker run -d --name patas-vidas -p 8000:8000 ghcr.io/gabryelcerqueira/patas---vidas--front---back-:latest
+```
+Acesse imediatamente em `http://localhost:8000` ou no IP/domínio do seu servidor!
 
 ---
 

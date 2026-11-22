@@ -1,18 +1,68 @@
-name: Docker Image CI
+name: Docker CI/CD - Build & Publish
 
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+  workflow_dispatch: # Permite disparar o deploy/build manualmente na aba Actions do GitHub
+
+permissions:
+  contents: read
+  packages: write
 
 jobs:
-
-  build:
-
+  build-and-deploy:
+    name: Build, Test & Publish Docker Image
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+      - name: 📥 Clonar repositório
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Configurar Docker Buildx (Cache e Multi-plataforma)
+        uses: docker/setup-buildx-action@v3
+
+      - name: 🔑 Login no GitHub Container Registry (GHCR)
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🏷️ Gerar Metadados e Tags para Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=sha,format=short,prefix=sha-
+            type=ref,event=branch
+
+      - name: 🔨 Construir e Publicar Imagem Fullstack (Dockerfile)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: 🧪 Validar Inicialização e Healthcheck do Container
+        run: |
+          IMAGE_ID=$(docker build -q .)
+          docker run -d --name test-app -p 8000:8000 $IMAGE_ID
+          sleep 6
+          curl -f http://localhost:8000/api || exit 1
+          echo "Healthcheck OK: Servidor e API respondendo com sucesso!"
+          docker stop test-app
+          docker rm test-app
+
+      - name: 🐳 Validar Build da Stack Multi-Container (Docker Compose)
+        run: |
+          docker compose build
+          echo "Sucesso: Multi-container (Frontend Nginx + Backend Flask) compilado com sucesso!"

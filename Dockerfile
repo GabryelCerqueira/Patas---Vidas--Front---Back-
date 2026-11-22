@@ -33,7 +33,10 @@ WORKDIR /app/backend
 
 EXPOSE 8000
 
+# Healthcheck interno do container para garantir disponibilidade do serviço
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD curl -f http://localhost:${PORT:-8000}/api || exit 1
+
 # Executa com Gunicorn para produção de alto desempenho
-# O servidor Flask integrado no server.py serve tanto as rotas da API (/api, /animais, etc.)
-# quanto as páginas web do frontend (/principal.html, adocao.html, etc.)
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "2", "--threads", "4", "server:app"]
+# Suporta a porta dinâmica $PORT definida automaticamente por Render, Railway, Fly.io, Cloud Run ou 8000 por padrão
+CMD ["sh", "-c", "gunicorn --bind 0.0.0.0:${PORT:-8000} --workers 2 --threads 4 server:app"]
